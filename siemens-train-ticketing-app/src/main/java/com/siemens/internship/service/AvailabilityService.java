@@ -1,4 +1,13 @@
 package com.siemens.internship.service;
 
-public class AvailabilityService {
+import com.siemens.internship.model.TrainSchedule;
+
+public interface AvailabilityService {
+
+    void validateAvailability(
+            TrainSchedule schedule,
+            Long fromStationId,
+            Long toStationId,
+            int requestedTickets
+    );
 }
