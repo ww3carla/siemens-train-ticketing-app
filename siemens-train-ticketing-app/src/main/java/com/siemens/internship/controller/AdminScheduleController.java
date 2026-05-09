@@ -1,6 +1,8 @@
 package com.siemens.internship.controller;
 
+import com.siemens.internship.dto.request.DelayRequest;
 import com.siemens.internship.dto.request.ScheduleRequest;
+import com.siemens.internship.dto.response.DelayResponse;
 import com.siemens.internship.dto.response.ScheduleResponse;
 import com.siemens.internship.service.AdminScheduleService;
 import jakarta.validation.Valid;
@@ -47,5 +49,13 @@ public class AdminScheduleController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSchedule(@PathVariable Long scheduleId) {
         adminScheduleService.deleteSchedule(scheduleId);
+    }
+
+    @PostMapping("/{scheduleId}/delay")
+    public DelayResponse reportDelay(
+            @PathVariable Long scheduleId,
+            @Valid @RequestBody DelayRequest request
+    ) {
+        return adminScheduleService.reportDelay(scheduleId, request);
     }
 }

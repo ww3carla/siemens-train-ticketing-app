@@ -1,11 +1,12 @@
 package com.siemens.internship.service;
 
+import com.siemens.internship.dto.request.DelayRequest;
 import com.siemens.internship.dto.request.ScheduleRequest;
+import com.siemens.internship.dto.response.DelayResponse;
 import com.siemens.internship.dto.response.ScheduleResponse;
 import com.siemens.internship.exception.ResourceNotFoundException;
-import com.siemens.internship.model.Route;
-import com.siemens.internship.model.Train;
-import com.siemens.internship.model.TrainSchedule;
+import com.siemens.internship.model.*;
+import com.siemens.internship.repository.BookingRepository;
 import com.siemens.internship.repository.RouteRepository;
 import com.siemens.internship.repository.TrainRepository;
 import com.siemens.internship.repository.TrainScheduleRepository;
@@ -21,14 +22,21 @@ public class AdminScheduleService {
     private final TrainRepository trainRepository;
     private final RouteRepository routeRepository;
 
+    private final BookingRepository bookingRepository;
+    private final EmailService emailService;
+
     public AdminScheduleService(
             TrainScheduleRepository trainScheduleRepository,
             TrainRepository trainRepository,
-            RouteRepository routeRepository
+            RouteRepository routeRepository,
+            BookingRepository bookingRepository,
+            EmailService emailService
     ) {
         this.trainScheduleRepository = trainScheduleRepository;
         this.trainRepository = trainRepository;
         this.routeRepository = routeRepository;
+        this.bookingRepository = bookingRepository;
+        this.emailService = emailService;
     }
 
     @Transactional(readOnly = true)
@@ -81,6 +89,29 @@ public class AdminScheduleService {
         }
 
         trainScheduleRepository.deleteById(scheduleId);
+    }
+
+    @Transactional
+    public DelayResponse reportDelay(Long scheduleId, DelayRequest request) {
+        TrainSchedule schedule = findScheduleById(scheduleId);
+
+        schedule.updateDelay(request.delayMinutes());
+
+        List<Booking> affectedBookings = bookingRepository.findByScheduleIdAndStatus(
+                scheduleId,
+                BookingStatus.CONFIRMED
+        );
+
+        emailService.sendDelayNotification(schedule, affectedBookings);
+
+        return new DelayResponse(
+                schedule.getId(),
+                schedule.getTrain().getTrainNumber(),
+                schedule.getDelayMinutes(),
+                request.reason(),
+                affectedBookings.size(),
+                "Delay registered successfully. Affected customers have been notified."
+        );
     }
 
     private TrainSchedule findScheduleById(Long scheduleId) {
