@@ -106,6 +106,19 @@ public class TrainSchedule {
         }
     }
 
+    public void updateTrainAndRoute(Train train, Route route) {
+        if (train == null) {
+            throw new IllegalArgumentException("Train must not be null.");
+        }
+
+        if (route == null) {
+            throw new IllegalArgumentException("Route must not be null.");
+        }
+
+        this.train = train;
+        this.route = route;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -100,6 +100,22 @@ public class Route {
         return value.trim();
     }
 
+    public void clearStops() {
+        stops.clear();
+    }
+
+    public void replaceStops(List<Station> stations) {
+        if (stations == null || stations.size() < 2) {
+            throw new IllegalArgumentException("A route must contain at least two stations.");
+        }
+
+        stops.clear();
+
+        for (int index = 0; index < stations.size(); index++) {
+            addStop(stations.get(index), index + 1);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
