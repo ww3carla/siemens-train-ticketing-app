@@ -1,4 +1,7 @@
 package com.siemens.internship.optimizer.model;
 
-public class OptimizationCriterion {
+public enum OptimizationCriterion {
+    DURATION,
+    COST,
+    DISTANCE
 }

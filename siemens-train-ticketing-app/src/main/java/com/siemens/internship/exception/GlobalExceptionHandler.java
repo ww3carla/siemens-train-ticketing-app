@@ -1,5 +1,6 @@
 package com.siemens.internship.exception;
 
+import com.siemens.internship.optimizer.service.OptimizationException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,6 +99,11 @@ public class GlobalExceptionHandler {
                 "Operation violates database integrity constraints.",
                 List.of("The requested operation conflicts with existing data.")
         );
+    }
+
+    @ExceptionHandler(OptimizationException.class)
+    public ResponseEntity<ApiErrorResponse> handleOptimizationException(OptimizationException exception) {
+        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), List.of());
     }
 
     private String formatFieldError(FieldError fieldError) {
